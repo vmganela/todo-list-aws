@@ -15,3 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.2] - 2022-05-21
 ### Added
 - Editado fichero **Jenkinsfile** del **FULL-STAGING** coverage aumentado al 80%  
+
+## [1.0.3] - 2022-05-24
+### Added
+- Modificada la pipeline para que se hagan revisiones de código
+- Modificado el codigo para seguir la guia de estilo pep8 de python

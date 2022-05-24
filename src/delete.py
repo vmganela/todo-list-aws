@@ -1,8 +1,10 @@
-import todoList
+"""Code related with the delete call"""
+import src.todoList
 
 
 def delete(event, context):
-    todoList.delete_item(event['pathParameters']['id'])
+    """Provides the logic to delete values."""
+    src.todoList.delete_item(event['pathParameters']['id'])
 
     # create a response
     response = {
