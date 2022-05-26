@@ -17,12 +17,12 @@ then
     exit 1
 fi
 
-flake8 src/*.py
-if [[ $? -ne 0 ]]
-then
-    echo 'Ha fallado el análisis de estilo(flake8)'
-    exit 1
-fi
+#flake8 src/*.py
+#if [[ $? -ne 0 ]]
+#then
+#    echo 'Ha fallado el análisis de estilo(flake8)'
+#    exit 1
+#fi
 bandit src/*.py
 if [[ $? -ne 0 ]]
 then
