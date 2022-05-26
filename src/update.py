@@ -1,8 +1,8 @@
 """Code related with the update"""
 import json
 import logging
-import decimalencoder
-import todoList
+import decimalencoder # pylint: disable=E0401
+import todoList # pylint: disable=E0401
 
 
 def update(event, context):

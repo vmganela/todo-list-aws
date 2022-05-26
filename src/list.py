@@ -1,7 +1,7 @@
 """Code related with the list call"""
 import json
-import decimalencoder
-import todoList
+import decimalencoder # pylint: disable=E0401
+import todoList # pylint: disable=E0401
 
 
 def list(event, context):
