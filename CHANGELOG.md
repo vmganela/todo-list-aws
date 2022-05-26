@@ -20,3 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Modificada la pipeline para que se hagan revisiones de código
 - Modificado el codigo para seguir la guia de estilo pep8 de python
+
+## [1.0.4] - 2022-05-26
+### Added
+- Modificada la pipeline para que se hagan revisiones de código
+- Issue en la respuestar del server solventada
