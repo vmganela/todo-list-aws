@@ -1,5 +1,5 @@
 """Code related with the delete call"""
-import todoList # pylint: disable=E0401
+import todoList#pylint: disable=E0401
 
 
 def delete(event, context):
