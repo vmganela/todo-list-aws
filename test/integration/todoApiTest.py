@@ -2,8 +2,8 @@
 import http.client
 import os
 import unittest
-#from urllib.request import urlopen
-import urllib
+from urllib.request import urlopen
+#import urllib
 import requests
 import json
 
