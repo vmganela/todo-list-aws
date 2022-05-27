@@ -14,8 +14,8 @@ pipeline {
                 sh script: """
                     set -x
                     git branch -a
-                    git checkout -b develop
-                    git checkout -b master
+                    git checkout develop
+                    git checkout master
                     git merge develop
                 """, label: "Merging code to master"
                 sshagent(['github']) {
