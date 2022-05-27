@@ -1,14 +1,16 @@
 # from pprint import pprint
 import warnings
+import pytest
 import unittest
 import boto3
-from moto import mock_dynamodb2
+from moto import mock_dynamodb
 import sys
 import os
 import json
 
-@mock_dynamodb2
+@mock_dynamodb
 class TestDatabaseFunctions(unittest.TestCase):
+    
     def setUp(self):
         print ('---------------------')
         print ('Start: setUp')
@@ -58,7 +60,6 @@ class TestDatabaseFunctions(unittest.TestCase):
         #self.assertIn('todoTable', self.table_local.name)
         print ('End: test_table_exists')
         
-
     def test_put_todo(self):
         print ('---------------------')
         print ('Start: test_put_todo')
@@ -104,6 +105,16 @@ class TestDatabaseFunctions(unittest.TestCase):
             self.text,
             responseGet['text'])
         print ('End: test_get_todo')
+    
+    def test_get_todo_error(self):
+        print ('---------------------')
+        print ('Start: test_get_todo_error')
+        from src.todoList import get_item
+       
+         # Table mock
+        self.assertRaises(Exception, get_item("", self.dynamodb))
+        self.assertRaises(Exception, get_item("", self.dynamodb))
+        print ('End: test_get_todo_error')
     
     def test_list_todo(self):
         print ('---------------------')
@@ -173,6 +184,7 @@ class TestDatabaseFunctions(unittest.TestCase):
                 self.uuid,
                 "",
                 self.dynamodb))
+    
         print ('End: atest_update_todo_error')
 
     def test_delete_todo(self):
@@ -199,8 +211,32 @@ class TestDatabaseFunctions(unittest.TestCase):
         # Testing file functions
         self.assertRaises(TypeError, delete_item("", self.dynamodb))
         print ('End: test_delete_todo_error')
+        
+    def test_get_table_one(self):
+        print ('---------------------')
+        print ('Start: test_get_table_one')
+        from src.todoList import get_table
+        # Testing file functions
+        self.assertEqual(self.table, get_table(self.dynamodb))
+        print ('End: test_get_table_one')
 
-
+    def test_get_table_two(self):
+        print ('---------------------')
+        print ('Start: test_get_table_two')
+        from src.todoList import get_table
+        # Testing file functions
+        self.assertRaises(Exception, get_table(None))
+        print ('End: test_get_table_two')
+        
+    def test_get_table_tree(self):
+        print ('---------------------')
+        print ('Start: test_get_table_two')
+        from src.todoList import get_table
+        # Testing file functions
+        os.environ['ENDPOINT_OVERRIDE']="http://localhost:8000/"
+        self.assertRaises(Exception, get_table(None))
+        print ('End: test_get_table_two')
+    
 
 if __name__ == '__main__':
     unittest.main()

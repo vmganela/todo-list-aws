@@ -1,27 +1,35 @@
+"""Main code of todo list applicacion"""
+
 import os
-import boto3
 import time
 import uuid
 import json
 import functools
+import boto3  # pylint: disable=E0401
 from botocore.exceptions import ClientError
 
 
 def get_table(dynamodb=None):
-    if not dynamodb:
-        URL = os.environ['ENDPOINT_OVERRIDE']
-        if URL:
-            print('URL dynamoDB:'+URL)
-            boto3.client = functools.partial(boto3.client, endpoint_url=URL)
-            boto3.resource = functools.partial(boto3.resource,
-                                               endpoint_url=URL)
-        dynamodb = boto3.resource("dynamodb")
-    # fetch todo from the database
-    table = dynamodb.Table(os.environ['DYNAMODB_TABLE'])
-    return table
+    """Restrieve the DB table"""
+    try:
+        if not dynamodb:
+            dynamo_url = os.environ['ENDPOINT_OVERRIDE']
+            if dynamo_url:
+                print('URL dynamoDB:'+dynamo_url)
+                boto3.client = functools.partial(boto3.client,
+                                                 endpoint_url=dynamo_url)
+                boto3.resource = functools.partial(boto3.resource,
+                                                   endpoint_url=dynamo_url)
+            dynamodb = boto3.resource("dynamodb")
+        # fetch todo from the database
+        table = dynamodb.Table(os.environ['DYNAMODB_TABLE'])
+        return table
+    except Exception as error:
+        print(error)
 
 
 def get_item(key, dynamodb=None):
+    """returns the item with the id passed from the database"""
     table = get_table(dynamodb)
     try:
         result = table.get_item(
@@ -30,15 +38,17 @@ def get_item(key, dynamodb=None):
             }
         )
 
-    except ClientError as e:
-        print(e.response['Error']['Message'])
+    except ClientError as error:
+        print(error.response['Error']['Message'])
     else:
         print('Result getItem:'+str(result))
         if 'Item' in result:
             return result['Item']
+    return None
 
 
 def get_items(dynamodb=None):
+    """returns all items in the db"""
     table = get_table(dynamodb)
     # fetch todo from the database
     result = table.scan()
@@ -46,6 +56,7 @@ def get_items(dynamodb=None):
 
 
 def put_item(text, dynamodb=None):
+    """Adds new item in the db"""
     table = get_table(dynamodb)
     timestamp = str(time.time())
     print('Table name:' + table.name)
@@ -65,13 +76,14 @@ def put_item(text, dynamodb=None):
             "body": json.dumps(item)
         }
 
-    except ClientError as e:
-        print(e.response['Error']['Message'])
+    except ClientError as error:
+        print(error.response['Error']['Message'])
     else:
         return response
 
 
 def update_item(key, text, checked, dynamodb=None):
+    """Updates the values of an item"""
     table = get_table(dynamodb)
     timestamp = int(time.time() * 1000)
     # update the todo in the database
@@ -81,12 +93,12 @@ def update_item(key, text, checked, dynamodb=None):
                 'id': key
             },
             ExpressionAttributeNames={
-              '#todo_text': 'text',
+                '#todo_text': 'text',
             },
             ExpressionAttributeValues={
-              ':text': text,
-              ':checked': checked,
-              ':updatedAt': timestamp,
+                ':text': text,
+                ':checked': checked,
+                ':updatedAt': timestamp,
             },
             UpdateExpression='SET #todo_text = :text, '
                              'checked = :checked, '
@@ -94,13 +106,14 @@ def update_item(key, text, checked, dynamodb=None):
             ReturnValues='ALL_NEW',
         )
 
-    except ClientError as e:
-        print(e.response['Error']['Message'])
+    except ClientError as error:
+        print(error.response['Error']['Message'])
     else:
         return result['Attributes']
 
 
 def delete_item(key, dynamodb=None):
+    """Deletes the item with the given ID"""
     table = get_table(dynamodb)
     # delete the todo from the database
     try:
@@ -109,19 +122,18 @@ def delete_item(key, dynamodb=None):
                 'id': key
             }
         )
-
-    except ClientError as e:
-        print(e.response['Error']['Message'])
+    except ClientError as error:
+        print(error.response['Error']['Message'])
     else:
         return
 
 
 def create_todo_table(dynamodb):
-    # For unit testing
-    tableName = os.environ['DYNAMODB_TABLE']
-    print('Creating Table with name:' + tableName)
+    """Creates a db for testing purpose"""
+    table_name = os.environ['DYNAMODB_TABLE']
+    print('Creating Table with name:' + table_name)
     table = dynamodb.create_table(
-        TableName=tableName,
+        TableName=table_name,
         KeySchema=[
             {
                 'AttributeName': 'id',
@@ -141,8 +153,8 @@ def create_todo_table(dynamodb):
     )
 
     # Wait until the table exists.
-    table.meta.client.get_waiter('table_exists').wait(TableName=tableName)
-    if (table.table_status != 'ACTIVE'):
+    table.meta.client.get_waiter('table_exists').wait(TableName=table_name)
+    if table.table_status != 'ACTIVE':
         raise AssertionError()
 
     return table

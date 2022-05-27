@@ -1,9 +1,11 @@
+"""Code related with the get call"""
 import json
-import decimalencoder
-import todoList
+import decimalencoder # pylint: disable=E0401
+import todoList # pylint: disable=E0401
 
 
 def get(event, context):
+    """logic for the get"""
     # create a response
     item = todoList.get_item(event['pathParameters']['id'])
     if item:
