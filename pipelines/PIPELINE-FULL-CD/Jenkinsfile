@@ -14,13 +14,12 @@ pipeline {
                 sh script: """
                     set -x
                     git branch -a
-                    git checkout develop
-                    git checkout master
+                    git checkout -b develop origin/develop
+                    git checkout -b master origin/master
                     git merge develop
                 """, label: "Merging code to master"
                 sshagent(['SSH_Jenkins_Caso_Practico1']) {
                     sh """
-                        git remote add origin git@github.com:vmganela/todo-list-aws.git
                         git push origin master
                     """
                 }
