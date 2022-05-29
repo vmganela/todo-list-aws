@@ -26,6 +26,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Modificada la pipeline para que se hagan revisiones de código
 - Issue en la respuestar del server solventada
 
-## [1.0.5] - 2022-05-26
+## [1.0.5] - 2022-05-29
 ### Added
 - STAGING PIPELINE start docker container for dynamodb
+
+## [1.0.6] - 2022-05-29
+### Added
+- Pipeline cleans docker infrastructure

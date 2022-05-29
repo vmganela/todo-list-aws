@@ -61,6 +61,11 @@ pipeline {
     }
     post { 
         always { 
+            echo 'Clean Docker I'
+            sh """
+                docker network rm sam
+                docker rm -f dynamodb
+            """
             echo 'Clean env: delete dir'
             cleanWs()
         }
