@@ -6,6 +6,13 @@ pipeline {
             steps{
                 echo 'Setup Virtualenv for testing'
                 sh "bash pipelines/PIPELINE-FULL-STAGING/setup.sh"
+                echo 'Setup Docker container for DynamoDB'
+                sh """
+                    docker network create sam
+                    docker rm -f dynamodb
+                    docker run -p 8000:8000 --network sam --name dynamodb -d amazon/dynamodb-local
+                    aws dynamodb create-table --table-name local-TodosDynamoDbTable --attribute-definitions AttributeName=id,AttributeType=S --key-schema AttributeName=id,KeyType=HASH --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1 --endpoint-url http://localhost:8000 --region us-east-1
+                """
             }
         }
         stage('Test'){
@@ -54,6 +61,11 @@ pipeline {
     }
     post { 
         always { 
+            echo 'Clean Docker I'
+            sh """
+                docker rm -f dynamodb
+                docker network rm sam
+            """
             echo 'Clean env: delete dir'
             cleanWs()
         }
