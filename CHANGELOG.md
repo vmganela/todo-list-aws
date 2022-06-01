@@ -38,3 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added Translate functions
 - Added Translate test
+
+## [1.1.1] - 2022-06-01
+### Fixed
+- Fix issues with FULL CD PIPELINE
