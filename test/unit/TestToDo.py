@@ -28,9 +28,12 @@ class TestDatabaseFunctions(unittest.TestCase):
             message="Using or importing.*")
         """Create the mock database and table"""
         self.dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
+        self.translate = boto3.client(service_name='translate', region_name='us-east-1', use_ssl=True)
         self.is_local = 'true'
         self.uuid = "123e4567-e89b-12d3-a456-426614174000"
         self.text = "Aprender DevOps y Cloud en la UNIR"
+        self.trans_text = "Learn DevOps and Cloud at UNIR"
+        self.lang = "EN"
 
         from src.todoList import create_todo_table
         self.table = create_todo_table(self.dynamodb)
@@ -46,7 +49,7 @@ class TestDatabaseFunctions(unittest.TestCase):
         #self.table_local.delete()
         self.dynamodb = None
         print ('End: tearDown')
-
+        
     def test_table_exists(self):
         print ('---------------------')
         print ('Start: test_table_exists')
@@ -96,10 +99,12 @@ class TestDatabaseFunctions(unittest.TestCase):
         print ('Response put_item:' + str(responsePut))
         idItem = json.loads(responsePut['body'])['id']
         print ('Id item:' + idItem)
+        
         self.assertEqual(200, responsePut['statusCode'])
         responseGet = get_item(
                 idItem,
                 self.dynamodb)
+                
         print ('Response Get:' + str(responseGet))
         self.assertEqual(
             self.text,
@@ -116,12 +121,31 @@ class TestDatabaseFunctions(unittest.TestCase):
         self.assertRaises(Exception, get_item("", self.dynamodb))
         print ('End: test_get_todo_error')
     
+    def test_translate_todo_error(self):
+        print ('---------------------')
+        print ('Start: test_translate_todo_error')
+        from src.todoList import translated_item
+        from src.todoList import put_item
+        from src.todoList import get_item
+        
+        # Table mock
+        self.assertRaises(Exception, translated_item("", self.lang, self.dynamodb))
+        
+        responsePut = put_item(self.text, self.dynamodb)
+        print ('Response put_item:' + str(responsePut))
+        idItem = json.loads(responsePut['body'])['id']
+        print ('Id item:' + idItem)
+        responseGet = get_item(idItem,self.dynamodb)
+        
+        self.assertRaises(Exception, translated_item(idItem, "", self.dynamodb))
+        print ('End: test_translate_todo_error')
+    
     def test_list_todo(self):
         print ('---------------------')
         print ('Start: test_list_todo')
         from src.todoList import put_item
         from src.todoList import get_items
-
+        
         # Testing file functions
         # Table mock
         put_item(self.text, self.dynamodb)
@@ -130,7 +154,6 @@ class TestDatabaseFunctions(unittest.TestCase):
         self.assertTrue(len(result) == 1)
         self.assertTrue(result[0]['text'] == self.text)
         print ('End: test_list_todo')
-
 
     def test_update_todo(self):
         print ('---------------------')
@@ -151,7 +174,6 @@ class TestDatabaseFunctions(unittest.TestCase):
         print ('Result Update Item:' + str(result))
         self.assertEqual(result['text'], updated_text)
         print ('End: test_update_todo')
-
 
     def test_update_todo_error(self):
         print ('---------------------')
@@ -236,7 +258,6 @@ class TestDatabaseFunctions(unittest.TestCase):
         os.environ['ENDPOINT_OVERRIDE']="http://localhost:8000/"
         self.assertRaises(Exception, get_table(None))
         print ('End: test_get_table_two')
-    
 
 if __name__ == '__main__':
     unittest.main()
