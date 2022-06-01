@@ -27,7 +27,6 @@ def get_table(dynamodb=None):
     except Exception as error:
         print(error)
 
-
 def get_item(key, dynamodb=None):
     """returns the item with the id passed from the database"""
     table = get_table(dynamodb)
@@ -44,6 +43,33 @@ def get_item(key, dynamodb=None):
         print('Result getItem:'+str(result))
         if 'Item' in result:
             return result['Item']
+    return None
+    
+
+def translated_item(key, lang, dynamodb=None):
+    """returns the item with the id passed from the database translated in a specific languaje"""
+    
+    table = get_table(dynamodb)
+    translate = boto3.client(service_name='translate', region_name='us-east-1', use_ssl=True)
+    
+    try:
+        result = table.get_item(
+            Key={
+                'id': key
+            }
+        )
+        translated_result = translate.translate_text(Text=result['Item']["text"], SourceLanguageCode="auto", TargetLanguageCode=lang)
+        result['Item']["text"] = translated_result.get('TranslatedText')
+        
+    except ClientError as error:
+        print(error.response['Error']['Message'])
+    except Exception as error:
+        print(error)
+    else:
+        print('Result getItem:'+str(result))
+        if 'Item' in result:
+            return result['Item']
+            
     return None
 
 
