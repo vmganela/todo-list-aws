@@ -36,7 +36,7 @@ pipeline {
         always {
             echo 'Clean CloudFormation stack'
             sh """
-                aws cloudformation delete-stack --stack-name todo-list-aws-staging
+                aws cloudformation delete-stack --stack-name todo-list-aws-staging --region us-east-1
             """
             echo 'Clean env: delete dir'
             cleanWs()
